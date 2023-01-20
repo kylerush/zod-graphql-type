@@ -1,0 +1,5 @@
+{
+  "ext": "ts, gql",
+  "ignore": ["node_modules"],
+  "exec": "ts-node-esm test/server.ts"
+}

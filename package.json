@@ -1,0 +1,62 @@
+{
+  "name": "zod-graphql-type",
+  "version": "0.1.0",
+  "description": "ZodError GraphQL type so that you can return Zod errors in your GraphQL API.",
+  "main": "build/index.js",
+  "type": "module",
+  "keywords": [
+    "zod",
+    "graphql",
+    "error"
+  ],
+  "scripts": {
+    "test": "NODE_ENV=test vitest run --coverage",
+    "test:watch": "NODE_ENV=test vitest --coverage",
+    "start": "nodemon",
+    "format": "prettier --check .",
+    "lint": "eslint .",
+    "typescript": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.build.json --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "package": "npm run format && npm run lint && npm run test && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kylerush/zod-graphql-type.git"
+  },
+  "author": {
+    "name": "Kyle Rush",
+    "url": "https://twitter.com/kylerush"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kylerush/zod-graphql-type/issues"
+  },
+  "homepage": "https://github.com/kylerush/zod-graphql-type#readme",
+  "dependencies": {
+    "graphql": "^16.6.0"
+  },
+  "devDependencies": {
+    "@graphql-tools/schema": "^9.0.13",
+    "@tsconfig/node18-strictest-esm": "^1.0.1",
+    "@types/node": "^18.11.18",
+    "@typescript-eslint/eslint-plugin": "^5.49.0",
+    "@typescript-eslint/parser": "^5.49.0",
+    "@vitest/coverage-c8": "^0.28.1",
+    "dotenv": "^16.0.3",
+    "eslint": "^8.32.0",
+    "fastify": "^4.12.0",
+    "mercurius": "^11.5.0",
+    "mercurius-codegen": "^5.0.1",
+    "mercurius-integration-testing": "^6.0.1",
+    "nodemon": "^2.0.20",
+    "pino-pretty": "^9.1.1",
+    "prettier": "^2.8.3",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4",
+    "vitest": "^0.28.1",
+    "zod": "^3.20.2"
+  },
+  "peerDependencies": {
+    "zod": "^3.20.2"
+  }
+}

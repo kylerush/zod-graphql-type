@@ -1,0 +1,58 @@
+query checkSchema(
+  $string: AnyType
+  $stringMax: String
+  $number: AnyType
+  $stringCustomError: AnyType
+  $union: AnyType
+  $secondUnion: AnyType
+  $enum: AnyType
+  $unrecognized: AnyType
+  $tooSmall: AnyType
+  $stringValidator: AnyType
+  $date: AnyType
+  $multipleOf: Int
+) {
+  checkSchema(
+    input: {
+      string: $string
+      stringMax: $stringMax
+      number: $number
+      stringCustomError: $stringCustomError
+      union: $union
+      secondUnion: $secondUnion
+      enum: $enum
+      unrecognized: $unrecognized
+      tooSmall: $tooSmall
+      stringValidator: $stringValidator
+      date: $date
+      multipleOf: $multipleOf
+    }
+  ) {
+    ... on Error {
+      __typename
+      message
+      zodIssues {
+        code
+        message
+        path
+        expected
+        received
+        keys
+        unionIssues {
+          code
+          expected
+          received
+          path
+          message
+        }
+        options
+        validation
+        type
+        minimum
+        maximum
+        inclusive
+        multipleOf
+      }
+    }
+  }
+}
