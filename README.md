@@ -1,14 +1,14 @@
 # zod-graphql-type
 
-ZodError GraphQL type so that you can return Zod errors in your GraphQL API.
+`ZodError` GraphQL type so that you can return [`zod`](https://github.com/colinhacks/zod) errors in your GraphQL API.
 
-As an example use case, let's assume you have a GraphQL mutation that signs a user into your application and it accepts Google oAuth tokens to authenticate the user. GraphQL can ensure the input types on the mutation are correct. But you might want to use zod to validate the oAuth token validation object that you get back from Google. This package allows you to return the zod validation errors in your mutation, providing crystal clear error detail to your API consumer.
+As an example use case, let's assume you have a GraphQL mutation that signs a user into your application. The mutation accepts a Google oAuth token to authenticate the user. GraphQL can ensure the input types on the mutation are correct. However, in your GraphQL resolver, you will want to verify the integrity of the oAuth token. Once you verify the integrity of the token, you can validate the token object with a zod schema. This package allows you to return any errors that zod throws for crystal clear error detail to your API consumer.
 
 This package gives you 3 things:
 
-1. A ZodError type definition to import into your GraphQL schema
-2. Custom GraphQL resolvers to make the ZodError type definition work
-3. A formatErrors
+1. A ZodError type definition to import into your GraphQL schema for use in other types;
+2. Custom GraphQL resolvers to make the ZodError type definition work;
+3. A formatErrors `zodErrorsTozodIssues` function to transform ZodError (has `Error` objects in it so it doesn't work with GraphQL nicely) into ZodIssues (no `Error` object).
 
 ## Getting started
 
@@ -18,26 +18,26 @@ This package gives you 3 things:
 
 ### Usage
 
-```
-import { zodTypeDef } from "zod-graphql-type"
+```js
+import { zodTypeDef } from "zod-graphql-type";
 ```
 
 Then add the type definition to your GraphQL type schema.
 
 Here is a Fastify Mercurius example:
 
-```
-import { Fastify } from "fastify"
-import mercurius from "mercurius"
-import { z } from "zod"
-import { zodTypeDef, scalars, formatErrors } from "zod-graphql-type"
+```js
+import { Fastify } from "fastify";
+import mercurius from "mercurius";
+import { z } from "zod";
+import { zodTypeDef, scalars, zodErrorsTozodIssues } from "zod-graphql-type";
 
-const fastify = Fastify()
+const fastify = Fastify();
 
 const schema = `
   ${zodTypeDef},
   input ObjectToValidate {
-    phrase: String
+    phraseFirstHalf: String
   }
   type Success {
     message: String!
@@ -47,51 +47,53 @@ const schema = `
     zodErrors: [ZodError]
   }
   type Query {
-    hello(input: ObjectToValidate): ZodError
+    validatePhrase(input: ObjectToValidate): ZodError
   }
-`
+`;
 
 const resolvers = {
   Query: {
-    hello: (_, { phrase }) => {
+    validatePhrase: (_, { phrase }) => {
+      const phraseSecondHalf = fetch(`https://someapi.com?phrase=${phrase}`);
+      // Create a zod schema to validate the argument
       const schema = z.object({
-        phrase: z.string().max(5)
-      })
+        phrase: z.literal("world"),
+      });
       try {
-        schema.parse(phrase)
+        schema.parse(phraseSecondHalf);
         return {
           __typename: "Success",
-          message: "Object passed validation."
-        }
+          message: "Object passed validation.",
+        };
       } catch (error) {
         return {
           __typename: "Error",
           message: "Object failed vlaidation.",
-          zodErrors: formatErrors(error)
-        }
+          zodErrors: zodErrorsTozodIssues(error),
+        };
       }
-    }
-  }
-}
+    },
+  },
+};
 
 app.register(mercurius, {
   schema,
-  resolvers
-})
+  resolvers,
+});
 
 app.get("/", async function (req, reply) {
-  const query = '{ hello(input: {phrase: "worlds"})}'
-  return reply.graphql(query)
-})
+  const query = '{ validatePhrase(input: {phraseFirstHalf: "world"})}';
+  return reply.graphql(query);
+});
 
-app.listen({ port: 3000 })
+app.listen({ port: 3000 });
 ```
 
 Note that you will need to use the `formatErrors` function which replaces `ZodError` with `ZodIssue[]`. `ZodError` is of type `Error` and if you return a type of `Error` to GraphQL it will not allow you to return the ZodIssues properly.
 
 ## Features
 
-More things than the feature below may work, but only the following issue codes are tested:
+The vast majority of ZodError types are tested and working. The following are tested:
 
 - `ZodIssueCode.invalid_type`
 - `ZodIssueCode.unrecognized_keys`
@@ -104,11 +106,13 @@ More things than the feature below may work, but only the following issue codes 
 - `ZodIssueCode.invalid_date`
 - `ZodIssueCode.not_multiple_of`
 
-Currently not working and not tested:
+The following are known to not work yet (support could be added in the future):
 
-- `ZodIssueCode.invalid_arguments` AKA z.function().args().implement()
-- `ZodIssueCode.invalid_return_type` AKA z.function().returnType().implement()
+- `ZodIssueCode.invalid_arguments` an error produced from `z.function().args().implement()`
+- `ZodIssueCode.invalid_return_type` an error produced from `z.function().returnType().implement()`
+
+Everything other than `z.function()` function schemas that use `.implement()` should be working properly. If you find a bug, please create an issue.
 
 ## Notes
 
-This is not yet 1.0. There are a few tests, but not enough. The null zod type does not work
+This is not yet a 1.0.0 release. Since this is under active development, versioning won't follow SEMVER until 1.0.0.
