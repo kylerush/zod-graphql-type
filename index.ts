@@ -4,6 +4,7 @@ import type { ZodError, ZodIssue } from "zod";
 export const zodTypeDef = `
   scalar StringNumber
   scalar ZodParsedType
+  scalar ZodIssueCode
   enum ZodValidation {
     url
     email
@@ -13,20 +14,6 @@ export const zodTypeDef = `
     string
     number
     array
-  }
-  enum ZodIssueCode {
-    invalid_type
-    unrecognized_keys
-    invalid_union
-    invalid_enum_value
-    invalid_arguments
-    invalid_return_type
-    invalid_date
-    invalid_string
-    too_small
-    too_big
-    not_multiple_of
-    custom
   }
   type ZodUnionIssue {
     code: ZodIssueCode!
@@ -95,6 +82,41 @@ const StringNumber = new GraphQLScalarType({
   parseLiteral: stringNumber,
 });
 
+export const issueCodes: Set<string> = new Set([
+  "invalid_type",
+  "unrecognized_keys",
+  "invalid_union",
+  "invalid_enum_value",
+  "invalid_arguments",
+  "invalid_return_type",
+  "invalid_date",
+  "invalid_string",
+  "too_small",
+  "too_big",
+  "not_multiple_of",
+  "custom",
+]);
+
+const ZodIssueCode = new GraphQLScalarType({
+  name: "ZodIssueCode",
+  description: "const enum for zod issue codes",
+  serialize: validateZodIssueCode,
+  parseValue: validateZodIssueCode,
+  parseLiteral: validateZodIssueCode,
+});
+
+export function validateZodIssueCode(value: unknown) {
+  if (typeof value !== "string") {
+    throw new Error("Provided value must be a string.");
+  }
+  if (!issueCodes.has(value)) {
+    throw new Error(
+      `Provided value is not one of ${Array.from(issueCodes).join(", ")}`
+    );
+  }
+  return value;
+}
+
 export function zodParsedType(value: unknown) {
   if (typeof value !== "string") {
     throw new Error("Provided value must be a string.");
@@ -137,4 +159,4 @@ export function zodErrorsTozodIssues(zodError: ZodError) {
   });
 }
 
-export const scalars = { StringNumber, ZodParsedType };
+export const zodErrorScalars = { StringNumber, ZodParsedType, ZodIssueCode };

@@ -3,7 +3,7 @@ import { fastify as Fastify, FastifyServerOptions } from "fastify";
 import mercurius from "mercurius";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { codegenMercurius } from "mercurius-codegen";
-import { zodTypeDef, scalars } from "../index.js";
+import { zodTypeDef, zodErrorScalars } from "../index.js";
 import { checkSchemaResolver, checkSchemaTypeDef } from "./check-schema.js";
 import { GraphQLScalarType } from "graphql";
 
@@ -27,7 +27,7 @@ export async function fastify(options: FastifyServerOptions = {}) {
 
   const resolvers = {
     AnyType,
-    ...scalars,
+    ...zodErrorScalars,
     Query: {
       ...checkSchemaResolver,
     },
@@ -41,7 +41,7 @@ export async function fastify(options: FastifyServerOptions = {}) {
     graphiql: true,
   });
 
-  if (process.env.NODE_ENV !== "test") {
+  if (process.env["NODE_ENV"] !== "test") {
     await codegenMercurius(fastify, {
       targetPath: "./types/graphql/generated.ts",
       silent: false,

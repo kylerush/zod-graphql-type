@@ -35,6 +35,8 @@ export type Scalars = {
   StringNumber: any;
   /** This is an enum used by Zod internally to represent the type of a parsed value. */
   ZodParsedType: any;
+  /** const enum for zod issue codes */
+  ZodIssueCode: any;
   /** Accepts any type. */
   AnyType: any;
   _FieldSet: any;
@@ -52,24 +54,9 @@ export enum ZodType {
   array = "array",
 }
 
-export enum ZodIssueCode {
-  invalid_type = "invalid_type",
-  unrecognized_keys = "unrecognized_keys",
-  invalid_union = "invalid_union",
-  invalid_enum_value = "invalid_enum_value",
-  invalid_arguments = "invalid_arguments",
-  invalid_return_type = "invalid_return_type",
-  invalid_date = "invalid_date",
-  invalid_string = "invalid_string",
-  too_small = "too_small",
-  too_big = "too_big",
-  not_multiple_of = "not_multiple_of",
-  custom = "custom",
-}
-
 export type ZodUnionIssue = {
   __typename?: "ZodUnionIssue";
-  code: ZodIssueCode;
+  code: Scalars["ZodIssueCode"];
   expected?: Maybe<Scalars["ZodParsedType"]>;
   received?: Maybe<Scalars["ZodParsedType"]>;
   path?: Maybe<Array<Maybe<Scalars["StringNumber"]>>>;
@@ -78,7 +65,7 @@ export type ZodUnionIssue = {
 
 export type ZodIssue = {
   __typename?: "ZodIssue";
-  code: ZodIssueCode;
+  code: Scalars["ZodIssueCode"];
   path?: Maybe<Array<Maybe<Scalars["StringNumber"]>>>;
   message: Scalars["String"];
   expected?: Maybe<Scalars["ZodParsedType"]>;
@@ -237,9 +224,9 @@ export type DirectiveResolverFn<
 export type ResolversTypes = {
   StringNumber: ResolverTypeWrapper<Scalars["StringNumber"]>;
   ZodParsedType: ResolverTypeWrapper<Scalars["ZodParsedType"]>;
+  ZodIssueCode: ResolverTypeWrapper<Scalars["ZodIssueCode"]>;
   ZodValidation: ZodValidation;
   ZodType: ZodType;
-  ZodIssueCode: ZodIssueCode;
   ZodUnionIssue: ResolverTypeWrapper<ZodUnionIssue>;
   String: ResolverTypeWrapper<Scalars["String"]>;
   ZodIssue: ResolverTypeWrapper<ZodIssue>;
@@ -257,6 +244,7 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   StringNumber: Scalars["StringNumber"];
   ZodParsedType: Scalars["ZodParsedType"];
+  ZodIssueCode: Scalars["ZodIssueCode"];
   ZodUnionIssue: ZodUnionIssue;
   String: Scalars["String"];
   ZodIssue: ZodIssue;
@@ -280,6 +268,11 @@ export interface StringNumberScalarConfig
 export interface ZodParsedTypeScalarConfig
   extends GraphQLScalarTypeConfig<ResolversTypes["ZodParsedType"], any> {
   name: "ZodParsedType";
+}
+
+export interface ZodIssueCodeScalarConfig
+  extends GraphQLScalarTypeConfig<ResolversTypes["ZodIssueCode"], any> {
+  name: "ZodIssueCode";
 }
 
 export type ZodUnionIssueResolvers<
@@ -414,6 +407,7 @@ export type ValidationResultResolvers<
 export type Resolvers<ContextType = MercuriusContext> = {
   StringNumber?: GraphQLScalarType;
   ZodParsedType?: GraphQLScalarType;
+  ZodIssueCode?: GraphQLScalarType;
   ZodUnionIssue?: ZodUnionIssueResolvers<ContextType>;
   ZodIssue?: ZodIssueResolvers<ContextType>;
   AnyType?: GraphQLScalarType;
@@ -446,7 +440,7 @@ export interface Loaders<
   }
 > {
   ZodUnionIssue?: {
-    code?: LoaderResolver<ZodIssueCode, ZodUnionIssue, {}, TContext>;
+    code?: LoaderResolver<Scalars["ZodIssueCode"], ZodUnionIssue, {}, TContext>;
     expected?: LoaderResolver<
       Maybe<Scalars["ZodParsedType"]>,
       ZodUnionIssue,
@@ -469,7 +463,7 @@ export interface Loaders<
   };
 
   ZodIssue?: {
-    code?: LoaderResolver<ZodIssueCode, ZodIssue, {}, TContext>;
+    code?: LoaderResolver<Scalars["ZodIssueCode"], ZodIssue, {}, TContext>;
     path?: LoaderResolver<
       Maybe<Array<Maybe<Scalars["StringNumber"]>>>,
       ZodIssue,
@@ -555,7 +549,7 @@ export type checkSchemaQuery = {
         message: string;
         zodIssues?: Array<{
           __typename?: "ZodIssue";
-          code: ZodIssueCode;
+          code: any;
           message: string;
           path?: Array<any | null> | null;
           expected?: any | null;
@@ -570,7 +564,7 @@ export type checkSchemaQuery = {
           multipleOf?: number | null;
           unionIssues?: Array<Array<{
             __typename?: "ZodUnionIssue";
-            code: ZodIssueCode;
+            code: any;
             expected?: any | null;
             received?: any | null;
             path?: Array<any | null> | null;

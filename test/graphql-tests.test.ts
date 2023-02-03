@@ -1,12 +1,8 @@
 import { describe, expect, test } from "vitest";
 import { createMercuriusTestClient } from "mercurius-integration-testing";
 import { fastify as Fastify } from "./fastify.js";
-import {
-  ZodIssueCode,
-  ZodType,
-  checkSchemaDocument,
-} from "../types/graphql/generated.js";
-import { ZodParsedType } from "zod";
+import { ZodType, checkSchemaDocument } from "../types/graphql/generated.js";
+import { ZodIssueCode, ZodParsedType } from "zod";
 
 describe.concurrent("Test suite", async () => {
   const fastify = await Fastify();
