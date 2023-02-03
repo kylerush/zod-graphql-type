@@ -1,6 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { ZodError, z } from "zod";
 import {
+  validateZodIssueCode,
   zodParsedType,
   zodParsedTypes,
   stringNumber,
@@ -8,6 +9,16 @@ import {
 } from "../index";
 
 describe.concurrent("index.ts suite", () => {
+  test("validateZodIssueCode", () => {
+    expect(validateZodIssueCode("invalid_type")).toEqual("invalid_type");
+    expect(() => {
+      validateZodIssueCode("not_valid");
+    }).toThrow();
+    expect(() => {
+      validateZodIssueCode(1);
+    }).toThrowError("Provided value must be a string.");
+  });
+
   test("zodParsedType", () => {
     // Happy path
     expect(zodParsedType("string")).toEqual("string");

@@ -44,10 +44,10 @@ const schema = `
   }
   type Error {
     message: String!
-    zodErrors: [ZodError]
+    zodIssues: [ZodIssue]
   }
   type Query {
-    validatePhrase(input: ObjectToValidate): ZodError
+    validatePhrase(input: ObjectToValidate): Success | Error
   }
 `;
 
@@ -69,7 +69,7 @@ const resolvers = {
         return {
           __typename: "Error",
           message: "Object failed vlaidation.",
-          zodErrors: zodErrorsTozodIssues(error),
+          zodIssues: zodErrorsTozodIssues(error),
         };
       }
     },
