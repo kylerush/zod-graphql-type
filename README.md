@@ -14,7 +14,9 @@ This package gives you 3 things:
 
 ### Installation
 
-`npm install zod-zod-graphql-type`
+```sh
+npm install zod-graphql-type
+```
 
 ### Usage
 
