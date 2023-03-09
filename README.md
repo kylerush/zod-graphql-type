@@ -118,3 +118,7 @@ Everything other than `z.function()` function schemas that use `.implement()` sh
 ## Notes
 
 This is not yet a 1.0.0 release. Since this is under active development, versioning won't follow SEMVER until 1.0.0.
+
+## Developing
+
+You can run the dev server with `npm run start`. Tests can be run with `npm run test` and with watch `npm run test:watch`. To fully check your branch run `npm run package`.
